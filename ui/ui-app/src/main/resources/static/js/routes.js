@@ -290,6 +290,22 @@ define(['angular', 'kylo-common', 'kylo-services',
             }
         });
 
+        $stateProvider.state({
+            name: 'data-data-explorer.**',
+            url: '/data-data-explorer',
+            lazyLoad: function (transition) {
+                transition.injector().get('$ocLazyLoad').load('feed-mgr/data-explorer/module').then(function success(args) {
+                    //upon success go back to the state
+                    $stateProvider.stateService.go('data-explorer')
+                    return args;
+                }, function error(err) {
+                    console.log("Error loading business-metadata ", err);
+                    return err;
+                });
+                ;
+            }
+        });
+
         //Ops Manager
 
         $stateProvider.state({
