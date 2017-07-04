@@ -19,7 +19,7 @@ define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil
             },
             data:{
                 breadcrumbRoot:true,
-                displayName:'Service Level Agreements',
+                displayName:'Data Explorer',
                 module:moduleName,
                 permissions:AccessConstants.UI_STATES.DATA_EXPLORER.permissions
             }
