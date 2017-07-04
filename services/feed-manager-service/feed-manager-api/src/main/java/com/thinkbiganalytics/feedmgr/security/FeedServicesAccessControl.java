@@ -67,6 +67,10 @@ public interface FeedServicesAccessControl {
                                                    "Access Tables",
                                                    "Allows listing and querying Hive tables");
 
+    Action ACCESS_DATA_EXPLORER = FEEDS_SUPPORT.subAction("dataExplorerAccess",
+                                                            "Data Explorer",
+                                                           "Allows viewing Alation data objects");
+
     Action ACCESS_VISUAL_QUERY = FEEDS_SUPPORT.subAction("accessVisualQuery",
                                                          "Access Visual Query",
                                                          "Allows access to visual query data wrangler");

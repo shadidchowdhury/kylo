@@ -61,6 +61,7 @@ public class FeedManagerSecurityConfiguration {
                                 .action(FeedServicesAccessControl.EXPORT_FEEDS)
                                 .action(FeedServicesAccessControl.ADMIN_FEEDS)
                                 .action(FeedServicesAccessControl.ACCESS_TABLES)
+                                .action(FeedServicesAccessControl.ACCESS_DATA_EXPLORER)
                                 .action(FeedServicesAccessControl.ACCESS_VISUAL_QUERY)
                                 .action(FeedServicesAccessControl.ACCESS_CATEGORIES)
                                 .action(FeedServicesAccessControl.EDIT_CATEGORIES)
