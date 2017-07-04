@@ -5,7 +5,7 @@ define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil
      * LAZY loaded in from /app.js
      */
     module.config(['$stateProvider',function ($stateProvider) {
-        $stateProvider.state(AccessConstants.UI_STATES.SERVICE_LEVEL_AGREEMENTS.state,{
+        $stateProvider.state(AccessConstants.UI_STATES.DATA_EXPLORER.state,{
             url:'/data-explorer',
             params: {
             },
@@ -21,7 +21,7 @@ define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil
                 breadcrumbRoot:true,
                 displayName:'Service Level Agreements',
                 module:moduleName,
-                permissions:AccessConstants.UI_STATES.SERVICE_LEVEL_AGREEMENTS.permissions
+                permissions:AccessConstants.UI_STATES.DATA_EXPLORER.permissions
             }
         })
 

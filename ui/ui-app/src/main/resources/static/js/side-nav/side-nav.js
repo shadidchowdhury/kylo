@@ -84,10 +84,10 @@ define(['angular','side-nav/module-name', 'constants/AccessConstants', 'side-nav
                     var links = [];
                     links.push({sref: "feeds",type:'link', icon: "linear_scale", text: "Feeds", permission: AccessConstants.UI_STATES.FEEDS.permissions});
                     links.push({sref: "categories",type:'link', icon: "folder_special", text: "Categories", permission: AccessConstants.UI_STATES.CATEGORIES.permissions});
-                    links.push({sref: "tables",type:'link', icon: "grid_on", text: "Tables1", permission: AccessConstants.UI_STATES.TABLES.permissions});
+                    links.push({sref: "tables",type:'link', icon: "grid_on", text: "Tables", permission: AccessConstants.UI_STATES.TABLES.permissions});
                     links.push({sref: "service-level-agreements",type:'link', icon: "beenhere", text: "SLA", permission: AccessConstants.UI_STATES.SERVICE_LEVEL_AGREEMENTS.permissions});
                     links.push({sref: "visual-query",type:'link', icon: "transform", text: "Visual Query", fullscreen: true, permission:AccessConstants.UI_STATES.VISUAL_QUERY.permissions});
-                    links.push({sref: "data-explorer",type:'link', icon: "zoom_in", text: "Data Explorer", permission:AccessConstants.UI_STATES.SERVICE_LEVEL_AGREEMENTS.permissions});
+                    links.push({sref: "data-explorer",type:'link', icon: "zoom_in", text: "Data Explorer", permission:AccessConstants.UI_STATES.DATA_EXPLORER.permissions});
                     addExtensionLinks(MENU_KEY.FEED_MGR, links);
                     menu.links = links;
                     menuMap[MENU_KEY.FEED_MGR] = menu;
