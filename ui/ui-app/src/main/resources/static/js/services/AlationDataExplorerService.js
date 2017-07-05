@@ -1,5 +1,5 @@
 define(['angular','services/module-name'], function (angular,moduleName) {
-    angular.module(moduleName).service('AlationExplorerService', ['$http', function ($http) {
+    angular.module(moduleName).service('AlationDataExplorerService', ['$http', function ($http) {
 
          this.alationSdkInit = function (alationBaseUrl) {
 
@@ -175,8 +175,8 @@ define(['angular','services/module-name'], function (angular,moduleName) {
                     ChooserEmbedMethod: ChooserEmbedMethod
                 }
             };
-        }
+        };
 
-        alationSdkInit('https://kylo.trialalation.com/');
+        this.alationSdkInit('https://kylo.trialalation.com/');
     }]);
 });

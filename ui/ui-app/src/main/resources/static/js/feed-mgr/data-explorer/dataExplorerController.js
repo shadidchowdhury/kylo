@@ -1,13 +1,13 @@
 define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, moduleName) {
 
-    var controller = function ($scope, AlationExplorerService) {
+    var controller = function ($scope, AlationDataExplorerService) {
         var self = this;
 
-        AlationExplorerService.alationSdkInit('https://kylo.trialalation.com/');
+        AlationDataExplorerService.alationSdkInit('https://kylo.trialalation.com/');
 
         this.openCatalog = function(){
-            var alationCatalogChooser = AlationExplorerService.Alation.Catalog.createChooser({
-                embedMethod: Alation.Catalog.ChooserEmbedMethod.MODAL,  // How to open the chooser (currently MODAL or CUSTOM)
+            var alationCatalogChooser = AlationDataExplorerService.Alation.Catalog.createChooser({
+                embedMethod: AlationDataExplorerService.Alation.Catalog.ChooserEmbedMethod.MODAL,  // How to open the chooser (currently MODAL or CUSTOM)
                 onSelect: function (data) {},  // Callback for when user selects an object
                 onCancel: function () {},  // Callback for when the user cancels
                 acceptObjectTypes: []  // List of acceptable oTypes (empty == all)
@@ -17,6 +17,6 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
         }
     };
 
-    angular.module(moduleName).controller('ServiceLevelAgreementController', ["$scope", "AlationExplorerService", controller]);
+    angular.module(moduleName).controller('DataExplorerController', ["$scope", "AlationDataExplorerService", controller]);
 
 });

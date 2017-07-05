@@ -1,4 +1,4 @@
-define(['angular','kylo-feedmgr','kylo-services','kylo-common','feed-mgr/data-explorer/dataExplorerController'],function() {
+define(['angular','kylo-feedmgr','kylo-services', 'services/AlationDataExplorerService', 'kylo-common','feed-mgr/data-explorer/dataExplorerController'],function() {
 });
 
 

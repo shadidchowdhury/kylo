@@ -1,4 +1,4 @@
-define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil','constants/AccessConstants','kylo-common', 'kylo-services','kylo-feedmgr','jquery'], function (angular,moduleName,lazyLoadUtil,AccessConstants) {
+define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil','constants/AccessConstants','kylo-common', 'services/AlationDataExplorerService','kylo-services','kylo-feedmgr','jquery'], function (angular,moduleName,lazyLoadUtil,AccessConstants) {
     var module = angular.module(moduleName, []);
 
     /**
@@ -23,21 +23,13 @@ define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil
                 module:moduleName,
                 permissions:AccessConstants.UI_STATES.DATA_EXPLORER.permissions
             }
-        })
+        });
 
         function lazyLoadController(path){
             return lazyLoadUtil.lazyLoadController(path,'feed-mgr/data-explorer/module-require');
         }
 
     }]);
-
-
-
-
-
-
-
-
 
     return module;
 });
