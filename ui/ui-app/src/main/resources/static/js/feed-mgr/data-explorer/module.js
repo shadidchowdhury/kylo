@@ -15,7 +15,7 @@ define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil
                 }
             },
             resolve: {
-                loadMyCtrl: lazyLoadController(['feed-mgr/data-explorer/data-explorer'])
+                loadMyCtrl: lazyLoadController(['feed-mgr/data-explorer/dataExplorerController'])
             },
             data:{
                 breadcrumbRoot:true,
