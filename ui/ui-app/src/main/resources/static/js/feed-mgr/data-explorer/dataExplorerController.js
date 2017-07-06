@@ -10,10 +10,20 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                 embedMethod: AlationDataExplorerService.Alation.Catalog.ChooserEmbedMethod.MODAL,  // How to open the chooser (currently MODAL or CUSTOM)
                 onSelect: function (data) {},  // Callback for when user selects an object
                 onCancel: function () {},  // Callback for when the user cancels
-                acceptObjectTypes: []  // List of acceptable oTypes (empty == all)
+                acceptObjectTypes: [
+                    //AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
+
+
+                ]  // List of acceptable oTypes (empty == all)
             });
 
-            alationCatalogChooser.open();
+            alationCatalogChooser.open({
+                    acceptObjectTypes: [
+                    ],
+                    acceptDataSourceTypes: [
+                    ]
+                }
+            );
         }
     };
 
