@@ -1,13 +1,45 @@
-define(['angular','services/module-name'], function (angular,moduleName) {
+define(['angular', 'services/module-name'], function (angular, moduleName) {
     angular.module(moduleName).service('AlationDataExplorerService', ['$http', function ($http) {
 
-         this.alationSdkInit = function (alationBaseUrl) {
+        this.alationSdkInit = function (alationBaseUrl) {
 
             alationBaseUrl = alationBaseUrl.replace(/\/$/, ""); // Remove trailing /, if it exists.
 
             var ChooserEmbedMethod = Object.freeze({
                 MODAL: 'MODAL',
                 CUSTOM: 'CUSTOM'
+            });
+
+            var ObjectType = Object.freeze({
+                DATA_SOURCE: 'data',
+                SCHEMA: 'schema',
+                TABLE: 'table',
+                COLUMN: 'attribute',
+                QUERY: 'query'
+            });
+
+            var DataSourceType = Object.freeze({
+                BIGQUERY: 'bigquery',
+                DB2: 'db2',
+                GREENPLUM: 'greenplum',
+                HIVE2: 'hive2',
+                IMPALA: 'impala',
+                MYSQL: 'mysql',
+                NETEZZA: 'netezza',
+                ORACLE: 'oracle',
+                ORIENT: 'orient',
+                POSTGRESQL: 'postgresql',
+                PRESTO: 'presto',
+                REDSHIFT: 'redshift',
+                SAP: 'sap',
+                SAS: 'sas',
+                SNOWFLAKE: 'snowflake',
+                SQLITE: 'sqlite',
+                SQLSERVER: 'sqlserver',
+                SYBASE: 'sybase',
+                TERADATA: 'teradata',
+                TERADATAASTER: 'teradataaster',
+                VERTICA: 'vertica'
             });
 
             var STYLESHEET_ID = 'alation-catalog-chooser-styles';
@@ -24,7 +56,7 @@ define(['angular','services/module-name'], function (angular,moduleName) {
                 return url + path;
             };
 
-            var getAlationChooserSdkFileUrl = function(filename) {
+            var getAlationChooserSdkFileUrl = function (filename) {
                 return getAlationUrl(CHOOSER_SDK_URL + '/' + filename);
             };
 
@@ -35,11 +67,12 @@ define(['angular','services/module-name'], function (angular,moduleName) {
              *  - onSelect
              *  - onCancel
              *  - acceptObjectTypes
+             *  - acceptDataSourceTypes
              */
             var CatalogChooser = function (options) {
                 this.options = options;
 
-                this.element = initIframe();
+                this.element = initIframe(options.acceptObjectTypes, options.acceptDataSourceTypes);
                 this._listeners = {
                     onSelect: [options.onSelect],
                     onCancel: [this.destroy.bind(this), options.onCancel]
@@ -94,11 +127,23 @@ define(['angular','services/module-name'], function (angular,moduleName) {
                 document.head.appendChild(stylesheet);
             };
 
-            var initIframe = function (chooser) {
+            var initIframe = function (acceptObjectTypes, acceptDataSourceTypes) {
+                var path = '/catalog_chooser/';
+                if (acceptObjectTypes) {
+                    path += '?accept_object_types=' + encodeURIComponent(acceptObjectTypes.join(','));
+                }
+                if (acceptDataSourceTypes) {
+                    var joinChar = path.indexOf('?') < 0 ? '?' : '&';
+                    path += (
+                        joinChar + 'accept_data_source_types=' +
+                        encodeURIComponent(acceptDataSourceTypes.join(','))
+                    );
+                }
+
                 // Create iframe.
                 var iframe = document.createElement('iframe');
                 iframe.setAttribute('class', CHOOSER_IFRAME_CLASS);
-                iframe.setAttribute('src', getAlationUrl('/catalog_chooser/'));
+                iframe.setAttribute('src', getAlationUrl(path));
                 return iframe;
             };
 
@@ -168,14 +213,17 @@ define(['angular','services/module-name'], function (angular,moduleName) {
             // Export
             var root = this;
             root.Alation = {
+                DataSourceType: DataSourceType,
                 Catalog: {
                     createChooser: function (options) {
                         return new CatalogChooser(options);
                     },
-                    ChooserEmbedMethod: ChooserEmbedMethod
+                    ChooserEmbedMethod: ChooserEmbedMethod,
+                    ObjectType: ObjectType
                 }
             };
         };
+
 
         this.alationSdkInit('https://kylo.trialalation.com/');
     }]);
