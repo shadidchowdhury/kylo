@@ -1,6 +1,7 @@
 define(['angular', 'services/module-name'], function (angular, moduleName) {
     angular.module(moduleName).service('AlationDataExplorerService', ['$http', function ($http) {
 
+        //TODO: this should be fetched from Alation service directly
         this.alationSdkInit = function (alationBaseUrl) {
 
             alationBaseUrl = alationBaseUrl.replace(/\/$/, ""); // Remove trailing /, if it exists.
@@ -224,7 +225,5 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
             };
         };
 
-
-        this.alationSdkInit('https://kylo.trialalation.com/');
     }]);
 });
