@@ -250,6 +250,7 @@ define([], function () {
         this.UI_STATES = {
             FEEDS: {state: "feeds", permissions: [this.FEEDS_ACCESS]},
             DEFINE_FEED: {state: "define-feed", permissions: [this.FEEDS_EDIT]},
+            DEFINE_FEED_POPULATED: {state: "define-feed-populated", permissions: [this.FEEDS_EDIT]},
             DEFINE_FEED_COMPLETE: {state: "define-feed-complete", permissions: [this.FEEDS_ACCESS]},
             IMPORT_FEED: {state: "import-feed", permissions: [this.FEEDS_IMPORT]},
             FEED_DETAILS: {state: "feed-details", permissions: [this.FEEDS_ACCESS]},

@@ -1,6 +1,6 @@
 define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, moduleName) {
 
-    var controller = function ($scope, $mdDialog, $mdToast, AlationDataExplorerService, DatasourcesService) {
+    var controller = function ($scope, $mdDialog, $mdToast, AlationDataExplorerService, DatasourcesService, FeedService, StateService) {
         var self = this;
 
         AlationDataExplorerService.alationSdkInit('https://kylo.trialalation.com/');
@@ -30,6 +30,12 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                                     .textContent("Successfully added data source " + dataSourceModel.name + ".")
                                     .hideDelay(3000)
                             );
+
+                            var feedModel = FeedService.getNewCreateFeedModel();
+                            FeedService.resetFeed();
+                            StateService.FeedManager().Feed().navigateToDefineFeedPopulated("2eb2984c-cc08-4524-898d-796e5701b43f");
+                            feedModel.templateId = "2eb2984c-cc08-4524-898d-796e5701b43f";
+                            FeedService.updateFeed(feedModel);
                             return savedModel;
                         }, function (err) {
                             $mdDialog.show(
@@ -68,6 +74,6 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
 
     };
 
-    angular.module(moduleName).controller('DataExplorerController', ["$scope", "$mdDialog", "$mdToast", "AlationDataExplorerService", "DatasourcesService", controller]);
+    angular.module(moduleName).controller('DataExplorerController', ["$scope", "$mdDialog", "$mdToast", "AlationDataExplorerService", "DatasourcesService", "FeedService", "StateService", controller]);
 
 });

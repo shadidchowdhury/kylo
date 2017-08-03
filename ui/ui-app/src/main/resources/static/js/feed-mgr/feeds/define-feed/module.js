@@ -33,6 +33,29 @@ define(['angular','feed-mgr/feeds/define-feed/module-name','kylo-utils/LazyLoadU
             }
         });
 
+        $stateProvider.state(AccessConstants.UI_STATES.DEFINE_FEED_POPULATED.state, {
+            url: '/define-feed-populated',
+            params: {
+                templateId: null
+            },
+            views: {
+                'content': {
+                    templateUrl: 'js/feed-mgr/feeds/define-feed/define-feed-populated.html',
+                    controller: 'DefineFeedControllerPopulated',
+                    controllerAs: 'vm'
+                }
+            },
+            resolve: {
+                loadMyCtrl: lazyLoadController(['feed-mgr/feeds/define-feed/DefineFeedControllerPopulated'])
+            },
+            data: {
+                breadcrumbRoot: false,
+                displayName: 'Define Feed from selected object',
+                module:moduleName,
+                permissions:AccessConstants.UI_STATES.DEFINE_FEED_POPULATED.permissions
+            }
+        });
+
         $stateProvider.state(AccessConstants.UI_STATES.DEFINE_FEED_COMPLETE.state, {
             url: '/define-feed-complete',
             params: {
