@@ -3,7 +3,10 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
     var controller = function ($scope, $mdDialog, $mdToast, AlationDataExplorerService, DatasourcesService, FeedService, StateService) {
         var self = this;
 
-        AlationDataExplorerService.alationSdkInit('https://kylo.trialalation.com/');
+        AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
+        var mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
+
+        console.log(AlationDataExplorerService.configurationPropertyMap);
 
         this.openCatalog = function () {
             var alationCatalogChooser = null;
@@ -18,7 +21,7 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                     dataSourceModel.description = data.qualifiedName;
                     dataSourceModel.databaseConnectionUrl = data.dataSource.jdbcUri;
                     dataSourceModel.databaseDriverClassName = "com.mysql.jdbc.Driver";
-                    dataSourceModel.databaseDriverLocation = "file:///opt/nifi/mysql/mysql-connector-java-5.0.8-bin.jar";
+                    dataSourceModel.databaseDriverLocation = mysqlDriver;
                     dataSourceModel.databaseUser = "kylo";
                     dataSourceModel.password = "test1234";
 
