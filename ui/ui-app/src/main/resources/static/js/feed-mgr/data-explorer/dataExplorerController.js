@@ -1,12 +1,22 @@
 define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, moduleName) {
 
-    var controller = function ($scope, $mdDialog, $mdToast, AlationDataExplorerService, DatasourcesService, FeedService, StateService) {
+    var controller = function ($scope, $mdDialog, $mdToast, $timeout, AlationDataExplorerService, DatasourcesService, FeedService, StateService) {
         var self = this;
+        var mysqlDriver;
 
-        AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
-        var mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
 
-        console.log(AlationDataExplorerService.configurationPropertyMap);
+        //This is to make sure the AlationDataExplorerService is initialized and it gets the time to fetch the config
+        if (AlationDataExplorerService.configurationPropertyMap['alation.url'] != null) {
+            AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
+            mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
+        } else {
+            $timeout(function () {
+                    AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
+                    mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
+                },
+                2000);
+        }
+
 
         this.openCatalog = function () {
             var alationCatalogChooser = null;
@@ -65,18 +75,18 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
             });
 
             alationCatalogChooser.open({
-                acceptObjectTypes: [
-                    AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
-                ],  // List of acceptable oTypes (empty == all)
-                acceptDataSourceTypes: [
-                    AlationDataExplorerService.Alation.DataSourceType.MYSQL
-                ]
+                    acceptObjectTypes: [
+                        AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
+                    ],  // List of acceptable oTypes (empty == all)
+                    acceptDataSourceTypes: [
+                        AlationDataExplorerService.Alation.DataSourceType.MYSQL
+                    ]
                 }
             );
         };
 
     };
 
-    angular.module(moduleName).controller('DataExplorerController', ["$scope", "$mdDialog", "$mdToast", "AlationDataExplorerService", "DatasourcesService", "FeedService", "StateService", controller]);
+    angular.module(moduleName).controller('DataExplorerController', ["$scope", "$mdDialog", "$mdToast", "$timeout", "AlationDataExplorerService", "DatasourcesService", "FeedService", "StateService", controller]);
 
 });
