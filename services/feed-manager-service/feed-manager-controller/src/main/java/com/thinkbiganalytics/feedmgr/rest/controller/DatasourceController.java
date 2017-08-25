@@ -165,7 +165,7 @@ public class DatasourceController {
 
             com.thinkbiganalytics.metadata.api.datasource.DatasourceCriteria criteria = createDatasourceCriteria(name, owner, on, after, before, type);
             return datasetProvider.getDatasources(criteria).stream()
-                .map(ds -> datasourceTransform.toDatasource(ds, DatasourceModelTransform.Level.CONNECTIONS))
+                .map(ds -> datasourceTransform.toDatasource(ds, DatasourceModelTransform.Level.FULL))
                 .collect(Collectors.toList());
         });
     }
