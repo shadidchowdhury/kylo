@@ -4,20 +4,6 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
         var self = this;
         var mysqlDriver;
 
-
-        //This is to make sure the AlationDataExplorerService is initialized and it gets the time to fetch the config
-        if (AlationDataExplorerService.configurationPropertyMap['alation.url'] != null) {
-            AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
-            mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
-        } else {
-            $timeout(function () {
-                    AlationDataExplorerService.alationSdkInit(AlationDataExplorerService.configurationPropertyMap['alation.url']);
-                    mysqlDriver = AlationDataExplorerService.configurationPropertyMap['alation.mysql.driverLocation'];
-                },
-                2000);
-        }
-
-
         this.openCatalog = function () {
             var alationCatalogChooser = null;
             alationCatalogChooser = AlationDataExplorerService.Alation.Catalog.createChooser({

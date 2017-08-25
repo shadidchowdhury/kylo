@@ -247,6 +247,8 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
                             });
                             self.configurationPropertyMap[key] = value;
                         })
+                        data.alationSdkInit(self.configurationPropertyMap['alation.url']);
+
                         if (successFn) {
                             successFn(response);
                         }
