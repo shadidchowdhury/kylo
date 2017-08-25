@@ -1,4 +1,4 @@
-define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil','constants/AccessConstants','kylo-common', 'services/AlationDataExplorerService','kylo-services','kylo-feedmgr','jquery'], function (angular,moduleName,lazyLoadUtil,AccessConstants) {
+define(['angular', 'feed-mgr/data-explorer/module-name','kylo-utils/LazyLoadUtil','constants/AccessConstants','kylo-common', 'feed-mgr/services/AlationDataExplorerService','kylo-services','kylo-feedmgr','jquery'], function (angular,moduleName,lazyLoadUtil,AccessConstants) {
     var module = angular.module(moduleName, []);
 
     /**
