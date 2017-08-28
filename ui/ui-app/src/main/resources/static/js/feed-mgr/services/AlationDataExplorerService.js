@@ -11,6 +11,14 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
 
             // TODO:  Should be fetched instead <script type="text/javascript" src="<scheme>://<domain>:<port>/integration/catalog_chooser/v1/sdk.js" />
 
+            supportedDataSourceTypes: function () {
+                return this.configurationPropertyMap['alation.acceptedDatasourceTypes'].split(",");
+            },
+
+            dataSourceDriverLocation: function (dataSourceType) {
+                return this.configurationPropertyMap['alation.driverLocation.' + dataSourceType];
+            },
+
             alationSdkInit: function (alationBaseUrl) {
 
                 alationBaseUrl = alationBaseUrl.replace(/\/$/, ""); // Remove trailing /, if it exists.

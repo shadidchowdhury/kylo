@@ -59,16 +59,14 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                 acceptObjectTypes: [
                     AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
                 ],  // List of acceptable oTypes (empty == all)
-                acceptDataSourceTypes: [
-                    AlationDataExplorerService.Alation.DataSourceType.MYSQL
-                ]
+                acceptDataSourceTypes: AlationDataExplorerService.supportedDataSourceTypes()
             });
 
             alationCatalogChooser.open({
                     acceptObjectTypes: [
                         AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
                     ],  // List of acceptable oTypes (empty == all)
-                    acceptDataSourceTypes: AlationDataExplorerService.configurationPropertyMap['alation.acceptedDatasourceTypes'].split(",")
+                    acceptDataSourceTypes: AlationDataExplorerService.supportedDataSourceTypes()
 
                 }
             );
