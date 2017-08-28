@@ -1,22 +1,26 @@
 define(['angular', 'services/module-name'], function (angular, moduleName) {
     angular.module(moduleName).service('AlationDataExplorerService', ['$http', 'RestUrlService', function ($http, RestUrlService) {
 
+        var ALATION_DRIVER_LOCATION_PROPERTY = 'alation.driverLocation.';
+        var ALATION_DATASOURCE_TYPES_PROPERTY = 'alation.acceptedDatasourceTypes';
+        var ALATION_URL_PROPERTY= 'alation.url';
+        var CONFIG_API = '/proxy/v1/configuration/properties';
+
         var data = {
             init: function () {
                 this.fetchConfigurationProperties();
             },
             configurationProperties: [],
-            propertyList: [],
             configurationPropertyMap: {},
 
             // TODO:  Should be fetched instead <script type="text/javascript" src="<scheme>://<domain>:<port>/integration/catalog_chooser/v1/sdk.js" />
 
             supportedDataSourceTypes: function () {
-                return this.configurationPropertyMap['alation.acceptedDatasourceTypes'].split(",");
+                return this.configurationPropertyMap[ALATION_DATASOURCE_TYPES_PROPERTY].split(",");
             },
 
             dataSourceDriverLocation: function (dataSourceType) {
-                return this.configurationPropertyMap['alation.driverLocation.' + dataSourceType];
+                return this.configurationPropertyMap[ALATION_DRIVER_LOCATION_PROPERTY + dataSourceType];
             },
 
             alationSdkInit: function (alationBaseUrl) {
@@ -246,16 +250,9 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
                     var _successFn = function (response) {
                         self.configurationProperties = response.data;
                         angular.forEach(response.data, function (value, key) {
-                            self.propertyList.push({
-                                key: key,
-                                value: value,
-                                description: null,
-                                dataType: null,
-                                type: 'alation'
-                            });
-                            self.configurationPropertyMap[key] = value;
+                            self.configurationPropertyMap[key] = value; //TODO read only alation properties
                         })
-                        data.alationSdkInit(self.configurationPropertyMap['alation.url']);
+                        data.alationSdkInit(self.configurationPropertyMap[ALATION_URL_PROPERTY]);
 
                         if (successFn) {
                             successFn(response);
@@ -267,7 +264,7 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
                         }
                     }
 
-                    var promise = $http.get('/proxy/v1/configuration/properties');
+                    var promise = $http.get(CONFIG_API);
                     promise.then(_successFn, _errorFn);
                     return promise;
                 }
