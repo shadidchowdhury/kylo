@@ -63,10 +63,14 @@ define(['angular', 'kylo-common', 'kylo-services',
         }).state({
             name: 'define-feed-populated.**',
             url: '/define-feed-populated',
+            params: {
+                templateId: null,
+                feedModel: null
+            },
             lazyLoad: function (transition) {
                 transition.injector().get('$ocLazyLoad').load('feed-mgr/feeds/define-feed/module').then(function success(args) {
                     //upon success go back to the state
-                    $stateProvider.stateService.go('define-feed-populated')
+                    $stateProvider.stateService.go('define-feed-populated', transition.params());
                     return args;
                 }, function error(err) {
                     console.log("Error loading define-feed ", err);
@@ -90,7 +94,6 @@ define(['angular', 'kylo-common', 'kylo-services',
                     console.log("Error loading feed-details ", err);
                     return err;
                 });
-                ;
             }
         }).state({
             name: 'edit-feed.**',

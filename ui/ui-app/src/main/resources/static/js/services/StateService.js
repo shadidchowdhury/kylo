@@ -110,8 +110,8 @@ define(['angular', 'services/module-name'], function (angular, moduleName) {
                 $state.go('define-feed', {templateId: templateId});
             }
 
-            data.navigateToDefineFeedPopulated = function (templateId) {
-                $state.go('define-feed-populated', {templateId: templateId});
+            data.navigateToDefineFeedPopulated = function (templateId, feedModel) {
+                $state.go('define-feed-populated', {templateId: templateId, feedModel: feedModel});
             }
 
             data.navigateToDefineFeedComplete = function (feedModel, error) {

@@ -1,6 +1,6 @@
 define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,moduleName) {
 
-    var controller = function ($scope, $http, $mdDialog, $q, AccessControlService, FeedService, FeedSecurityGroups,RestUrlService, StateService, UiComponentsService) {
+    var controller = function ($scope, $http, $mdDialog, $q, $transition$, AccessControlService, FeedService, FeedSecurityGroups,RestUrlService, StateService, UiComponentsService) {
 
         var self = this;
 
@@ -12,7 +12,7 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
 
         this.layout = 'first';
         this.template = null;
-        self.model = FeedService.createFeedModel;
+        self.model = $transition$.params().feedModel;
 
         self.allTemplates = [];
         self.firstTemplates = [];
@@ -164,7 +164,7 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
             });
     };
 
-    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "AccessControlService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
+    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "$transition$","AccessControlService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
                                                                    "UiComponentsService", controller]);
 
 });

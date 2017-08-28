@@ -2,27 +2,34 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
 
     var controller = function ($scope, $mdDialog, $mdToast, $timeout, AlationDataExplorerService, DatasourcesService, FeedService, StateService) {
         var self = this;
-        var mysqlDriver;
 
         this.openCatalog = function () {
             var alationCatalogChooser = null;
             alationCatalogChooser = AlationDataExplorerService.Alation.Catalog.createChooser({
                 embedMethod: AlationDataExplorerService.Alation.Catalog.ChooserEmbedMethod.MODAL,
                 onSelect: function (data) {
-                    console.log("data is selected");
-                    console.log(data);
 
-                    var dataSourceModel = DatasourcesService.newJdbcDatasource();
+/*                    var dataSourceModel = DatasourcesService.newJdbcDatasource();
                     dataSourceModel.name = data.qualifiedName;
                     dataSourceModel.description = data.qualifiedName;
                     dataSourceModel.databaseConnectionUrl = data.dataSource.jdbcUri;
                     dataSourceModel.databaseDriverClassName = "com.mysql.jdbc.Driver";
                     dataSourceModel.databaseDriverLocation = mysqlDriver;
                     dataSourceModel.databaseUser = "kylo";
-                    dataSourceModel.password = "test1234";
+                    dataSourceModel.password = "test1234";*/
 
+                    var feedModel = FeedService.getNewCreateFeedModel();
+                    feedModel.templateId = "2eb2984c-cc08-4524-898d-796e5701b43f";
+                    feedModel.feedName = data.qualifiedName;
+                    feedModel.description = data.qualifiedName;
+                    StateService.FeedManager().Feed().navigateToDefineFeedPopulated("2eb2984c-cc08-4524-898d-796e5701b43f", feedModel);
+                    FeedService.updateFeed(feedModel);
 
-                    DatasourcesService.save(dataSourceModel)
+                    //TODO: Get all data sources and check if the data source is already configured
+                    // Show error warning message if data source is not there
+                    //TODO: Find the data ingest template and select that in the feed model in defineFeedController
+
+/*                    DatasourcesService.save(dataSourceModel
                         .then(function (savedModel) {
                             $mdToast.show(
                                 $mdToast.simple()
@@ -30,11 +37,8 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                                     .hideDelay(3000)
                             );
 
-                            var feedModel = FeedService.getNewCreateFeedModel();
                             FeedService.resetFeed();
-                            StateService.FeedManager().Feed().navigateToDefineFeedPopulated("2eb2984c-cc08-4524-898d-796e5701b43f");
-                            feedModel.templateId = "2eb2984c-cc08-4524-898d-796e5701b43f";
-                            FeedService.updateFeed(feedModel);
+
                             return savedModel;
                         }, function (err) {
                             $mdDialog.show(
@@ -46,7 +50,7 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                                     .ok("Got it!")
                             );
                             return error;
-                        });
+                        });*/
 
                     alationCatalogChooser.destroy();
                 },  // Callback for when user selects an object
@@ -64,9 +68,8 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                     acceptObjectTypes: [
                         AlationDataExplorerService.Alation.Catalog.ObjectType.TABLE
                     ],  // List of acceptable oTypes (empty == all)
-                    acceptDataSourceTypes: [
-                        AlationDataExplorerService.Alation.DataSourceType.MYSQL
-                    ]
+                    acceptDataSourceTypes: AlationDataExplorerService.configurationPropertyMap['alation.acceptedDatasourceTypes'].split(",")
+
                 }
             );
         };
