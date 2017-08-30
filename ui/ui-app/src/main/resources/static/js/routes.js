@@ -62,7 +62,7 @@ define(['angular', 'kylo-common', 'kylo-services',
             }
         }).state({
             name: 'define-feed-populated.**',
-            url: '/define-feed-populated',
+            url: '/define-feed-populated?jdbcURL&tableName',
             params: {
                 templateId: null,
                 feedModel: null
@@ -76,7 +76,6 @@ define(['angular', 'kylo-common', 'kylo-services',
                     console.log("Error loading define-feed ", err);
                     return err;
                 });
-                ;
             }
         }).state({
             name: 'feed-details.**',
