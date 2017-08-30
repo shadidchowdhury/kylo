@@ -39,7 +39,26 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
 
                     //this.selectTemplate(self.allTemplates[0]);
 
-                    var template = self.allTemplates[0];
+                    var template = null;
+
+                    self.allTemplates.forEach(function (templateObj) {
+                        if(templateObj.templateName === 'Data Ingest'){
+                            template = templateObj;
+                        }
+                    });
+
+                    if(template == null){
+                        $mdDialog.show(
+                            $mdDialog.alert()
+                                .clickOutsideToClose(true)
+                                .title("Data Ingestion template required")
+                                .textContent("The Data Ingestion template need to be installed to create the feed.")
+                                .ariaLabel("Failed to create feed")
+                                .ok("Got it!")
+                        );
+                        return;
+                    }
+
                     self.model.templateId = template.id;
                     self.model.templateName = template.templateName;
                     //setup some initial data points for the template
@@ -92,10 +111,10 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
         this.more = function () {
             this.layout = 'all';
         };
-
+/*
         this.gotoImportFeed = function () {
             StateService.FeedManager().Feed().navigatetoImportFeed();
-        };
+        };*/
         getRegisteredTemplates();
 
         this.selectTemplate = function (template) {
