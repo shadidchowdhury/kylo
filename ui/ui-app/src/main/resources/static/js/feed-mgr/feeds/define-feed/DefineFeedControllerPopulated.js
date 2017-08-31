@@ -1,6 +1,6 @@
-define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,moduleName) {
+define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular, moduleName) {
 
-    var controller = function ($scope, $http, $mdDialog, $q, $transition$, AccessControlService, FeedService, FeedSecurityGroups,RestUrlService, StateService, UiComponentsService) {
+    var controller = function ($scope, $http, $mdDialog, $q, $transition$, AccessControlService, FeedService, FeedSecurityGroups, RestUrlService, StateService, UiComponentsService) {
 
         var self = this;
 
@@ -12,6 +12,8 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
 
         this.layout = 'first';
         this.template = null;
+        var jdbcURL = $transition$.params().jdbcURL;
+        var tableName = $transition$.params().tableName;
         self.model = $transition$.params().feedModel;
 
         self.allTemplates = [];
@@ -42,12 +44,12 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
                     var template = null;
 
                     self.allTemplates.forEach(function (templateObj) {
-                        if(templateObj.templateName === 'Data Ingest'){
+                        if (templateObj.templateName === 'Data Ingest') {
                             template = templateObj;
                         }
                     });
 
-                    if(template == null){
+                    if (template == null) {
                         $mdDialog.show(
                             $mdDialog.alert()
                                 .clickOutsideToClose(true)
@@ -58,6 +60,17 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
                         );
                         return;
                     }
+
+                    // TODO remove the following block to a different function
+
+                    if (tableName != null && self.model == null) {
+                        self.model = FeedService.getNewCreateFeedModel();
+                        self.model.description = tableName;
+                        self.model.feedName = tableName;
+                    }
+
+
+                    // TODO remove the upper block to a different function
 
                     self.model.templateId = template.id;
                     self.model.templateName = template.templateName;
@@ -111,10 +124,10 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
         this.more = function () {
             this.layout = 'all';
         };
-/*
-        this.gotoImportFeed = function () {
-            StateService.FeedManager().Feed().navigatetoImportFeed();
-        };*/
+        /*
+         this.gotoImportFeed = function () {
+         StateService.FeedManager().Feed().navigatetoImportFeed();
+         };*/
         getRegisteredTemplates();
 
         this.selectTemplate = function (template) {
@@ -163,15 +176,18 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
         };
 
 
-        self.onStepperInitialized = function(stepper) {
-            var accessChecks = {entityAccess: AccessControlService.checkEntityAccessControlled(), securityGroups: FeedSecurityGroups.isEnabled()};
+        self.onStepperInitialized = function (stepper) {
+            var accessChecks = {
+                entityAccess: AccessControlService.checkEntityAccessControlled(),
+                securityGroups: FeedSecurityGroups.isEnabled()
+            };
             $q.all(accessChecks).then(function (response) {
                 var entityAccess = AccessControlService.isEntityAccessControlled();
                 var securityGroupsAccess = response.securityGroups;
                 //disable the access control step
-                if(!entityAccess && !securityGroupsAccess) {
+                if (!entityAccess && !securityGroupsAccess) {
                     //Access Control is second to last step 0 based array indexc
-                    stepper.deactivateStep(self.model.totalSteps -2);
+                    stepper.deactivateStep(self.model.totalSteps - 2);
                 }
             });
         };
@@ -183,7 +199,7 @@ define(['angular','feed-mgr/feeds/define-feed/module-name'], function (angular,m
             });
     };
 
-    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "$transition$","AccessControlService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
-                                                                   "UiComponentsService", controller]);
+    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "$transition$", "AccessControlService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
+        "UiComponentsService", controller]);
 
 });
