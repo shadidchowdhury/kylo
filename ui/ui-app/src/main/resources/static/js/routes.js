@@ -62,7 +62,7 @@ define(['angular', 'kylo-common', 'kylo-services',
             }
         }).state({
             name: 'define-feed-populated.**',
-            url: '/define-feed-populated?jdbcURL&tableName',
+            url: '/define-feed-populated?dbURL&tableName',
             params: {
                 selectedTableName: null,
                 selectedDataSource: null

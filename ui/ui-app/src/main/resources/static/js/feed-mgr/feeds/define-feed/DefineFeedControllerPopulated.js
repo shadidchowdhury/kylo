@@ -1,6 +1,6 @@
 define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular, moduleName) {
 
-    var controller = function ($scope, $http, $mdDialog, $q, $transition$, AccessControlService, FeedService, FeedSecurityGroups, RestUrlService, StateService, UiComponentsService) {
+    var controller = function ($scope, $http, $mdDialog, $q, $transition$, AccessControlService, DatasourcesService, FeedService, FeedSecurityGroups, RestUrlService, StateService, UiComponentsService) {
 
         var self = this;
 
@@ -13,8 +13,8 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
         this.layout = 'first';
         this.template = null;
         var selectedTableName = $transition$.params().selectedTableName;
-        var selectedDataSource = selectedDataSource;
-        var dataSourceParam = $transition$.params().dataSource;
+        var selectedDataSource = $transition$.params().selectedDataSource;
+        var jdbcUriParam = $transition$.params().dbURL;
         var tableNameParam = $transition$.params().tableName;
         self.model = null;
 
@@ -43,6 +43,42 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
 
                     //this.selectTemplate(self.allTemplates[0]);
 
+                    //TODO remove the following block to a different function
+                    if (selectedTableName != null && selectedDataSource != null) {
+                        self.tableName = selectedTableName;
+                        self.jdbcURL = selectedDataSource.jdbcUri;
+
+                    } else if (tableNameParam != null && jdbcUriParam != null) {
+                        self.tableName = tableNameParam;
+                        self.jdbcURL = jdbcUriParam;
+                    }
+                    var dataSourceExist = false;
+
+                    DatasourcesService.findAll()
+                        .then(function (datasources) {
+                            datasources.forEach(function (datasource) {
+                                console.log('feed cotrl '+datasource);
+                                if (datasource.databaseConnectionUrl === self.jdbcURL) {
+                                    dataSourceExist = true;
+                                }
+                            });
+
+                            if (!dataSourceExist) {
+                                $mdDialog.show(
+                                    $mdDialog.alert()
+                                        .clickOutsideToClose(true)
+                                        .title("Data Source is not available")
+                                        .textContent("Please ask Kylo admin to add the data source " + self.jdbcURL)
+                                        .ariaLabel("Failed to add feed")
+                                        .ok("Got it!")
+                                );
+
+                                return;
+                            }
+
+                        });
+                    //TODO remove the upper block to a different function
+
                     var template = null;
 
                     self.allTemplates.forEach(function (templateObj) {
@@ -64,13 +100,6 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
                     }
 
                     // TODO remove the following block to a different function
-
-                    if (selectedTableName != null ) {
-                        self.tableName = selectedTableName;
-
-                    }else if(tableNameParam != null){
-                        self.tableName = tableNameParam;
-                    }
 
                     self.model = FeedService.getNewCreateFeedModel();
                     self.model.description = self.tableName;
@@ -207,7 +236,7 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
             });
     };
 
-    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "$transition$", "AccessControlService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
+    angular.module(moduleName).controller('DefineFeedControllerPopulated', ["$scope", "$http", "$mdDialog", "$q", "$transition$", "AccessControlService", "DatasourcesService", "FeedService", "FeedSecurityGroups", "RestUrlService", "StateService",
         "UiComponentsService", controller]);
 
 });

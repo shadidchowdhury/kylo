@@ -17,40 +17,8 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                      dataSourceModel.databaseDriverLocation = mysqlDriver;
                      dataSourceModel.databaseUser = "kylo";
                      dataSourceModel.password = "test1234";*/
-                    var dataSourceExist = false;
 
-
-                    //TODO move this logic to defineFeedControllerPopulated
-                    DatasourcesService.findAll()
-                        .then(function (datasources) {
-                            datasources.forEach(function (datasource) {
-                                console.log(datasource);
-
-                                if (datasource.databaseConnectionUrl === data.dataSource.jdbcUri) {
-                                    dataSourceExist = true;
-                                }
-                            });
-
-
-                            if (!dataSourceExist) {
-                                $mdDialog.show(
-                                    $mdDialog.alert()
-                                        .clickOutsideToClose(true)
-                                        .title("Data Source is not available")
-                                        .textContent("Please ask Kylo admin to add the data source " + data.dataSource.jdbcUri)
-                                        .ariaLabel("Failed to add feed")
-                                        .ok("Got it!")
-                                );
-
-                                alationCatalogChooser.destroy();
-
-                                return;
-                            }
-
-                            StateService.FeedManager().Feed().navigateToDefineFeedPopulated( data.qualifiedName, data.dataSource);
-
-                        });
-
+                    StateService.FeedManager().Feed().navigateToDefineFeedPopulated(data.qualifiedName, data.dataSource);
 
                     /*                    DatasourcesService.save(dataSourceModel
                      .then(function (savedModel) {
