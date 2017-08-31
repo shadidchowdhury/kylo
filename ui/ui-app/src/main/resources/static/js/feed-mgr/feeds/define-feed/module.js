@@ -34,10 +34,10 @@ define(['angular','feed-mgr/feeds/define-feed/module-name','kylo-utils/LazyLoadU
         });
 
         $stateProvider.state(AccessConstants.UI_STATES.DEFINE_FEED_POPULATED.state, {
-            url: '/define-feed-populated?jdbcURL&tableName',
+            url: '/define-feed-populated?dataSource&tableName',
             params: {
-                templateId: null,
-                feedModel: null
+                selectedTableName: null,
+                selectedDataSource: null
             },
             views: {
                 'content': {

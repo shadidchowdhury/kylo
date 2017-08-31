@@ -52,7 +52,6 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
          */
         this.defineFeedGeneralForm = {};
         this.templates = [];
-        //this.model = FeedService.createFeedModel;
         this.model = this.feedModel;
         this.isValid = false;
         this.stepNumber = parseInt(this.stepIndex) + 1

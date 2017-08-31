@@ -12,9 +12,11 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
 
         this.layout = 'first';
         this.template = null;
-        var jdbcURL = $transition$.params().jdbcURL;
-        var tableName = $transition$.params().tableName;
-        self.model = $transition$.params().feedModel;
+        var selectedTableName = $transition$.params().selectedTableName;
+        var selectedDataSource = selectedDataSource;
+        var dataSourceParam = $transition$.params().dataSource;
+        var tableNameParam = $transition$.params().tableName;
+        self.model = null;
 
         self.allTemplates = [];
         self.firstTemplates = [];
@@ -63,11 +65,17 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
 
                     // TODO remove the following block to a different function
 
-                    if (tableName != null && self.model == null) {
-                        self.model = FeedService.getNewCreateFeedModel();
-                        self.model.description = tableName;
-                        self.model.feedName = tableName;
+                    if (selectedTableName != null ) {
+                        self.tableName = selectedTableName;
+
+                    }else if(tableNameParam != null){
+                        self.tableName = tableNameParam;
                     }
+
+                    self.model = FeedService.getNewCreateFeedModel();
+                    self.model.description = self.tableName;
+                    self.model.feedName = self.tableName;
+                    FeedService.updateFeed(self.model);
 
 
                     // TODO remove the upper block to a different function

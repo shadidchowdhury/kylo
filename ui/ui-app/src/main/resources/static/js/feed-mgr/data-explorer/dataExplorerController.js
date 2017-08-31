@@ -47,11 +47,7 @@ define(['angular', "feed-mgr/data-explorer/module-name"], function (angular, mod
                                 return;
                             }
 
-                            var feedModel = FeedService.getNewCreateFeedModel();
-                            feedModel.feedName = data.qualifiedName;
-                            feedModel.description = data.qualifiedName;
-                            StateService.FeedManager().Feed().navigateToDefineFeedPopulated("2eb2984c-cc08-4524-898d-796e5701b43f", feedModel);
-                            FeedService.updateFeed(feedModel);
+                            StateService.FeedManager().Feed().navigateToDefineFeedPopulated( data.qualifiedName, data.dataSource);
 
                         });
 
