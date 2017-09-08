@@ -7,7 +7,7 @@
       </kylo-define-feed-step>
 
       <kylo-define-feed-step title="Feed Details" step="vm.steps[1]">
-        <thinkbig-define-feed-details step-index="1"></thinkbig-define-feed-details>
+        <thinkbig-define-feed-details-populated step-index="1" feed-model="vm.coreDataModel"></thinkbig-define-feed-details-populated>
       </kylo-define-feed-step>
 
       <kylo-table-options-stepper ng-if="vm.coreDataModel.templateTableOption != 'NO_TABLE'" selected-step-index="vm.selectedStepIndex" steps="vm.steps" step-index="2"

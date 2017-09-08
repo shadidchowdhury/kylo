@@ -46,18 +46,17 @@ define(['angular', 'feed-mgr/feeds/define-feed/module-name'], function (angular,
                     //TODO remove the following block to a different function
                     if (selectedTableName != null && selectedDataSource != null) {
                         self.tableName = selectedTableName;
-                        self.jdbcURL = selectedDataSource.jdbcUri;
+                        self.jdbcURL = 'jdbc:' + selectedDataSource.jdbcUri;
 
                     } else if (tableNameParam != null && jdbcUriParam != null) {
                         self.tableName = tableNameParam;
-                        self.jdbcURL = jdbcUriParam;
+                        self.jdbcURL = 'jdbc:' + jdbcUriParam;
                     }
                     var dataSourceExist = false;
 
                     DatasourcesService.findAll()
                         .then(function (datasources) {
                             datasources.forEach(function (datasource) {
-                                console.log('feed cotrl '+datasource);
                                 if (datasource.databaseConnectionUrl === self.jdbcURL) {
                                     dataSourceExist = true;
                                 }
