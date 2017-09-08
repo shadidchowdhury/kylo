@@ -854,7 +854,7 @@ define(['angular','feed-mgr/module-name'], function (angular,moduleName) {
                         self.model.loading = false;
                     }
                     var id = registeredTemplateId != undefined && registeredTemplateId != null ? registeredTemplateId : self.model.nifiTemplateId;
-                    var promise = $http.get(RestUrlService.GET_REGISTERED_TEMPLATE_URL(id), {params: {allProperties: true, templateName: templateName}});
+                    var promise = $http.get(RestUrlService.GET_REGISTERED_TEMPLATE_URL(id), {params: {templateName: templateName}});
                     promise.then(successFn, errorFn);
                     return promise;
                 }
