@@ -510,11 +510,11 @@ define(['angular'], function (angular) {
                      dataSourceModel.databaseUser = "kylo";
                      dataSourceModel.password = "test1234";*/
 
-                    var fullTableName = data.qaulifiedName;
+                    var fullTableName = data.qualifiedName;
                     var dataSource = data.dataSource;
 
-                    var schemaName = processorTableName.substring(0, fullTableName.indexOf("."));
-                    var tableName = processorTableName.substring(fullTableName.indexOf(".") + 1);
+                    var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
+                    var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
                     var fullNameLower = fullTableName.toLowerCase();
 
 
