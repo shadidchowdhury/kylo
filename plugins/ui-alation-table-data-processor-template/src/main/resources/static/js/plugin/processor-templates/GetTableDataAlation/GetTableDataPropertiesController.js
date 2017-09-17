@@ -518,7 +518,7 @@ define(['angular'], function (angular) {
                     var fullNameLower = fullTableName.toLowerCase();
 
 
-                    self.selectedTable = {
+                    self.selectedTable = self.tablesAutocomplete.selectedTable = {
                         schema: schemaName,
                         tableName: tableName,
                         fullName: fullTableName,
@@ -566,7 +566,7 @@ define(['angular'], function (angular) {
 
                 }
             );
-        };
+        }
 
         /**
          * Change listener when the user updates a NiFi property in UI
