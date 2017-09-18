@@ -517,6 +517,8 @@ define(['angular'], function (angular) {
                     var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
                     var fullNameLower = fullTableName.toLowerCase();
 
+                    //TODO: match and find the right data source for Alation
+                    self.dbConnectionProperty.value = "858acf23-015e-1000-dfba-c27a239a1779";
 
                     self.selectedTable = self.tablesAutocomplete.selectedTable = {
                         schema: schemaName,
