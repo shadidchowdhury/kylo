@@ -325,7 +325,7 @@ define(['angular'], function (angular) {
         return data;
     }
 
-    var controller = function ($scope, $q, $http, $mdToast, RestUrlService, FeedService, EditFeedNifiPropertiesService, DBCPTableSchemaService, AlationDataExplorerService) {
+    var controller = function ($scope, $q, $http, $mdToast, $mdDialog, RestUrlService, FeedService, EditFeedNifiPropertiesService, DBCPTableSchemaService, AlationDataExplorerService, AlationService) {
 
         var self = this;
         /**
@@ -462,8 +462,14 @@ define(['angular'], function (angular) {
                     self.dataSources = _.map(services, function(service) {
                         return {displayName: service.name, value: service.id, url: service.properties["Database Connection URL"]}
                     });
+
+                    fillDataFromAlation();
                 }, function() {
-                    // error
+                    $mdToast.show(
+                        $mdToast.simple()
+                            .textContent('Unable to get the existing data sources.  A unexpected error occurred.')
+                            .hideDelay(3000)
+                    );
                 });
         }
 
@@ -517,14 +523,6 @@ define(['angular'], function (angular) {
                 embedMethod: AlationDataExplorerService.Alation.Catalog.ChooserEmbedMethod.MODAL,
                 onSelect: function (data) {
 
-                    /*                    var dataSourceModel = DatasourcesService.newJdbcDatasource();
-                     dataSourceModel.name = data.qualifiedName;
-                     dataSourceModel.description = data.qualifiedName;
-                     dataSourceModel.databaseConnectionUrl = data.dataSource.jdbcUri;
-                     dataSourceModel.databaseDriverClassName = "com.mysql.jdbc.Driver";
-                     dataSourceModel.databaseDriverLocation = mysqlDriver;
-                     dataSourceModel.databaseUser = "kylo";
-                     dataSourceModel.password = "test1234";*/
 
                     var fullTableName = data.qualifiedName;
                     var selectedDataSource = data.dataSource;
@@ -538,6 +536,17 @@ define(['angular'], function (angular) {
                         return 'jdbc:' + selectedDataSource.jdbcUri == dataSource.url;
                     });
 
+                    if(matchingDataSource == null){
+                        $mdDialog.show(
+                            $mdDialog.alert()
+                                .clickOutsideToClose(true)
+                                .title("Data source does not exist")
+                                .textContent("Please add the data source url: " + 'jdbc:' + selectedDataSource.jdbcUri) // TODO add type as well
+                                .ariaLabel("No matching data source configured")
+                                .ok("OK")
+                        );
+                    }
+
                     self.dbConnectionProperty.value = matchingDataSource.value;
 
                     self.selectedTable = self.tablesAutocomplete.selectedTable = {
@@ -547,28 +556,6 @@ define(['angular'], function (angular) {
                         fullNameLower: fullNameLower
                     };
 
-                    //StateService.FeedManager().Feed().navigateToDefineFeedPopulated(data.qualifiedName, data.dataSource);
-
-                    /*                    DatasourcesService.save(dataSourceModel
-                     .then(function (savedModel) {
-                     $mdToast.show(
-                     $mdToast.simple()
-                     .textContent("Successfully added data source " + dataSourceModel.name + ".")
-                     .hideDelay(3000)
-                     );
-                     FeedService.resetFeed();
-                     return savedModel;
-                     }, function (err) {
-                     $mdDialog.show(
-                     $mdDialog.alert()
-                     .clickOutsideToClose(true)
-                     .title("Save Failed")
-                     .textContent("The data source '" + model.name + "' could not be saved. " + err.data.message)
-                     .ariaLabel("Failed to save data source")
-                     .ok("Got it!")
-                     );
-                     return error;
-                     });*/
 
                     alationCatalogChooser.destroy();
                 },  // Callback for when user selects an object
@@ -610,6 +597,44 @@ define(['angular'], function (angular) {
                 }
             }
         };
+
+
+        function fillDataFromAlation(){
+            if(AlationService.selectedData.fullTableName != null && AlationService.selectedData.dataSourceURI != null){
+                setAlationData(AlationService.selectedData.fullTableName, AlationService.selectedData.dataSourceURI);
+            }
+        }
+
+        function setAlationData(fullTableName, jdbcUri){
+            var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
+            var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
+            var fullNameLower = fullTableName.toLowerCase();
+
+
+            var matchingDataSource = _.find(self.dataSources, function (dataSource) {
+                return 'jdbc:' + jdbcUri == dataSource.url;
+            });
+
+            if(matchingDataSource == null){
+                $mdDialog.show(
+                    $mdDialog.alert()
+                        .clickOutsideToClose(true)
+                        .title("Data source does not exist")
+                        .textContent("Please add the data source url: " + 'jdbc:' + jdbcUri) // TODO add type as well
+                        .ariaLabel("No matching data source configured")
+                        .ok("OK")
+                );
+            }
+
+            self.dbConnectionProperty.value = matchingDataSource.value;
+
+            self.selectedTable = self.tablesAutocomplete.selectedTable = {
+                schema: schemaName,
+                tableName: tableName,
+                fullName: fullTableName,
+                fullNameLower: fullNameLower
+            };
+        }
 
         /**
          * Finds the correct NiFi processor Property associated with the incoming key.
@@ -999,7 +1024,7 @@ define(['angular'], function (angular) {
 
     var moduleName = "kylo.plugin.processor-template.tabledata";
     angular.module(moduleName, [])
-    angular.module(moduleName).controller('GetTableDataPropertiesController', ["$scope", "$q", "$http", "$mdToast", "RestUrlService", "FeedService", "EditFeedNifiPropertiesService", "DBCPTableSchemaService", "AlationDataExplorerService", controller]);
+    angular.module(moduleName).controller('GetTableDataPropertiesController', ["$scope", "$q", "$http", "$mdToast", "$mdDialog", "RestUrlService", "FeedService", "EditFeedNifiPropertiesService", "DBCPTableSchemaService", "AlationDataExplorerService", "AlationService", controller]);
 
 
     angular.module(moduleName).service('AlationDataExplorerService', ['$http', 'RestUrlService', service]);

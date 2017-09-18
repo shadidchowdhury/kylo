@@ -1,0 +1,28 @@
+{
+  "moduleName": "",
+  "moduleJsUrl":"plugin/alation-module/module",
+  "states": [
+    {
+      "state": "alationModule",
+      "url": "/alation?dbURL&tableName",
+      "params": {
+        "name": null
+      }
+    }
+  ],
+  "navigation": [
+    {
+      "toggleGroupName": "DISCOVER_DATA",
+      "text": "Discover Data",
+      "narrowText": "Discover",
+      "links": [
+        {
+          "sref": "alationModule",
+          "icon": "zoom_in",
+          "text": "Alation",
+          "permission": ["accessExample"]
+        }
+      ]
+    }
+  ]
+}
