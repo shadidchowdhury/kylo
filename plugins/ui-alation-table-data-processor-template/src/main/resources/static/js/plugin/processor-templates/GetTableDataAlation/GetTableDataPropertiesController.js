@@ -432,6 +432,8 @@ define(['angular'], function (angular) {
          */
         initPropertyLookup();
 
+        findDataSources(this.dbConnectionProperty);
+
         /**
          * lookup and find the respective Nifi Property objects that map to the custom property keys
          */
@@ -449,6 +451,20 @@ define(['angular'], function (angular) {
 
             self.deleteSourceProperty = {value: 'false', key: 'Delete Source'};
             self.incrementalFieldProperty = findProperty(self.INCREMENTALPROPERTY_KEY);
+        }
+
+        function findDataSources (property) {
+
+            // Fetch the list of controller services
+            FeedService.getAvailableControllerServices(property.propertyDescriptor.identifiesControllerService)
+                .then(function(services) {
+                    // Update the allowable values
+                    self.dataSources = _.map(services, function(service) {
+                        return {displayName: service.name, value: service.id, url: service.properties["Database Connection URL"]}
+                    });
+                }, function() {
+                    // error
+                });
         }
 
 
@@ -511,14 +527,18 @@ define(['angular'], function (angular) {
                      dataSourceModel.password = "test1234";*/
 
                     var fullTableName = data.qualifiedName;
-                    var dataSource = data.dataSource;
+                    var selectedDataSource = data.dataSource;
 
                     var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
                     var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
                     var fullNameLower = fullTableName.toLowerCase();
 
-                    //TODO: match and find the right data source for Alation
-                    self.dbConnectionProperty.value = "858acf23-015e-1000-dfba-c27a239a1779";
+
+                    var matchingDataSource = _.find(self.dataSources, function (dataSource) {
+                        return 'jdbc:' + selectedDataSource.jdbcUri == dataSource.url;
+                    });
+
+                    self.dbConnectionProperty.value = matchingDataSource.value;
 
                     self.selectedTable = self.tablesAutocomplete.selectedTable = {
                         schema: schemaName,
