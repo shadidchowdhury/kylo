@@ -1,3 +1,3 @@
 define([], function () {
-    return "alation-plugin";
+    return "alation-module";
 });

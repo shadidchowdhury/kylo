@@ -18,7 +18,7 @@
  * #L%
  */
 
-define(['angular'], function (angular) {
+define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/AlationService'], function (angular) {
 
     var directive = function () {
         return {
