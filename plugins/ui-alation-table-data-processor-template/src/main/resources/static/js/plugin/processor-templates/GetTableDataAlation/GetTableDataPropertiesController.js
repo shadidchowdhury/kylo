@@ -325,7 +325,7 @@ define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/Alatio
         return data;
     }
 
-    var controller = function ($scope, $q, $http, $mdToast, $mdDialog, RestUrlService, FeedService, EditFeedNifiPropertiesService, DBCPTableSchemaService, AlationDataExplorerService, AlationService) {
+    var controller = function ($scope, $q, $http, $mdToast, $mdDialog, RestUrlService, FeedService, EditFeedNifiPropertiesService, DBCPTableSchemaService, AlationDataExplorerService) {
 
         var self = this;
         /**
@@ -527,7 +527,9 @@ define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/Alatio
                     var fullTableName = data.qualifiedName;
                     var selectedDataSource = data.dataSource;
 
-                    var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
+                    setAlationData(fullTableName, selectedDataSource.jdbcUri);
+
+                   /* var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
                     var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
                     var fullNameLower = fullTableName.toLowerCase();
 
@@ -554,7 +556,7 @@ define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/Alatio
                         tableName: tableName,
                         fullName: fullTableName,
                         fullNameLower: fullNameLower
-                    };
+                    };*/
 
 
                     alationCatalogChooser.destroy();
@@ -600,8 +602,10 @@ define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/Alatio
 
 
         function fillDataFromAlation(){
-            if(AlationService.selectedData.fullTableName != null && AlationService.selectedData.dataSourceURI != null){
-                setAlationData(AlationService.selectedData.fullTableName, AlationService.selectedData.dataSourceURI);
+            if(self.model.feedDescriptor.length >= 2){
+                var jdbcUri = self.model.feedDescriptor[0];
+                var tableName = self.model.feedDescriptor[1];
+                setAlationData(tableName, jdbcUri);
             }
         }
 
@@ -1024,7 +1028,7 @@ define(['angular', 'plugin/alation-module/module', 'plugin/alation-module/Alatio
 
     var moduleName = "kylo.plugin.processor-template.tabledata";
     angular.module(moduleName, [])
-    angular.module(moduleName).controller('GetTableDataPropertiesController', ["$scope", "$q", "$http", "$mdToast", "$mdDialog", "RestUrlService", "FeedService", "EditFeedNifiPropertiesService", "DBCPTableSchemaService", "AlationDataExplorerService", "AlationService", controller]);
+    angular.module(moduleName).controller('GetTableDataPropertiesController', ["$scope", "$q", "$http", "$mdToast", "$mdDialog", "RestUrlService", "FeedService", "EditFeedNifiPropertiesService", "DBCPTableSchemaService", "AlationDataExplorerService", controller]);
 
 
     angular.module(moduleName).service('AlationDataExplorerService', ['$http', 'RestUrlService', service]);
