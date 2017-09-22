@@ -1,0 +1,5 @@
+{
+  "processorDisplayName":"Run Feed",
+  "processorTypes":["org.apache.nifi.processors.standard.GenerateFlowFile"],
+  "stepperTemplateUrl":"js/plugin/processor-templates/data-transform/run-feed/run-feed-processor.html"
+}

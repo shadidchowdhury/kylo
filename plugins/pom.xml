@@ -26,7 +26,11 @@
     <module>hadoop-authorization-ranger-default</module>
     <module>hadoop-authorization-sentry-default</module>
     <module>schema-discovery-default</module>
+    <module>alation-plugin-services</module>
+    <module>alation-module</module>
+    <module>ui-alation-table-data-processor-template</module>
     <module>ui-sqoop-table-data-processor-template</module>
+    <module>example-ui-data-transform-template</module>
     <module>search-elasticsearch</module>
     <module>search-solr</module>
     <module>jms-service-activemq</module>
