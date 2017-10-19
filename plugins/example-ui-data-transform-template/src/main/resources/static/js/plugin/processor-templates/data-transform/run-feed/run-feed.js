@@ -18,56 +18,72 @@ define(['angular'], function (angular) {
         };
 
     }
-    var controller =  function($scope,$q,$http,$mdToast, $interval, FeedService,VisualQueryService, DatasourcesService) {
+    var controller = function ($scope, $q, $http, $mdToast, $mdDialog, $interval, FeedService, VisualQueryService, DatasourcesService) {
 
-      var self = this;
-      this.alationFeed = false;
+        var self = this;
+        this.alationFeed = false;
 
-      self.feedModel = FeedService.createFeedModel;
+        self.feedModel = FeedService.createFeedModel;
         self.availableDatasources = [{id: VisualQueryService.HIVE_DATASOURCE, name: "Hive"}];
+        self.dataSourceControllers = [];
 
         self.model = VisualQueryService.model;
+        self.selectedTable = {};
+        self.tablesAutocomplete = {selectedTable: {}};
+        var nextNodeID = 10;
 
         init();
 
-
-/*      if(feedModel.feedDescriptor == 'alationFeed'){
-          self.alationFeed = true;
-          if(angular.isUndefined(vqServiceModel.visualQueryModel)){
-              //build it
-              populateVisualQueryModelWithExample();
-          }
-      }*/
-
         function init() {
-            // Get the list of data sources
             DatasourcesService.findAll()
                 .then(function (datasources) {
                     Array.prototype.push.apply(self.availableDatasources, datasources);
+                })
+                .finally(function () {
+                    // Fetch the list of controller services
+                    FeedService.getAvailableControllerServices("org.apache.nifi.dbcp.DBCPService")
+                        .then(function (services) {
+                            // Update the allowable values
+                            self.dataSourceControllers = _.map(services, function (service) {
+                                return {
+                                    name: service.name,
+                                    id: service.id,
+                                    url: service.properties["Database Connection URL"]
+                                }
+                            });
+
+                            fillDataFromAlation();
+                        }, function () {
+                            $mdToast.show(
+                                $mdToast.simple()
+                                    .textContent('Unable to get the existing data sources.  A unexpected error occurred.')
+                                    .hideDelay(3000)
+                            );
+                        });
                 });
 
         }
 
 
-        function fillDataFromAlation(){
-            if(self.feedModel.feedDescriptor.length >= 2){
+        function fillDataFromAlation() {
+            if (self.feedModel.feedDescriptor.length >= 2) {
                 var jdbcUri = self.feedModel.feedDescriptor[0];
                 var tableName = self.feedModel.feedDescriptor[1];
                 setAlationData(tableName, jdbcUri);
             }
         }
 
-        function setAlationData(fullTableName, jdbcUri){;
+        function setAlationData(fullTableName, jdbcUri) {
             var schemaName = fullTableName.substring(0, fullTableName.indexOf("."));
             var tableName = fullTableName.substring(fullTableName.indexOf(".") + 1);
             var fullNameLower = fullTableName.toLowerCase();
 
 
-            var matchingDataSource = _.find(self.availableDatasources, function (dataSource) {
+            var matchingDataSourceController = _.find(self.dataSourceControllers, function (dataSource) {
                 return 'jdbc:' + jdbcUri == dataSource.url;
             });
 
-            if(matchingDataSource == null){
+            if (matchingDataSourceController == null) {
                 $mdDialog.show(
                     $mdDialog.alert()
                         .clickOutsideToClose(true)
@@ -76,9 +92,14 @@ define(['angular'], function (angular) {
                         .ariaLabel("No matching data source configured")
                         .ok("OK")
                 );
+                return;
             }
 
-            self.model.selectedDatasourceId = matchingDataSource.value;
+            var selectedDataSource = _.find(self.availableDatasources, function (dataSource) {
+                return matchingDataSourceController.id == dataSource.controllerServiceId;
+            });
+
+            self.model.selectedDatasourceId = selectedDataSource.id;
 
             self.selectedTable = self.tablesAutocomplete.selectedTable = {
                 schema: schemaName,
@@ -95,13 +116,14 @@ define(['angular'], function (angular) {
             //get attributes for table
             var datasourceId = self.model.selectedDatasourceId;
             var nodeName = table.schema + "." + table.tableName;
-            getTableSchema(table.schema, table.tableName, function(schemaData) {
+            getTableSchema(table.schema, table.tableName, function (schemaData) {
                 //
                 // Template for a new node.
                 //
                 var coord = getNewXYCoord();
+                var chartDataModel = {connections: [], nodes: []};
 
-                angular.forEach(schemaData.fields, function(attr) {
+                angular.forEach(schemaData.fields, function (attr) {
                     attr.selected = true;
                 });
                 var newNodeDataModel = {
@@ -132,137 +154,162 @@ define(['angular'], function (angular) {
                         }
                     ]
                 };
-                self.prepareNode(newNodeDataModel);
-                self.chartViewModel.addNode(newNodeDataModel);
-                validate();
+
+                chartDataModel.nodes.push(newNodeDataModel);
+                self.model.visualQueryModel = chartDataModel;
             })
 
         };
 
-        function newTableNodeDataModel(datasourceId,schema,table, nodeId,coord,attrs) {
-          var nodeName = schema + "." + table;
-          return {
-              name: nodeName,
-              id: nodeId,
-              datasourceId: datasourceId,
-              x: coord.x,
-              y: coord.y,
-              nodeAttributes: {
-                  attributes: attrs,
-                  reference: [schema, table],
-                  selected: []
-              },
-              connectors: {
-                  "top": {
-                      "location": "TOP",
-                      "id": 7
-                  },
-                  "bottom": {
-                      "location": "BOTTOM",
-                      "id": 8
-                  },
-                  "left": {
-                      "location": "LEFT",
-                      "id": 5
-                  },
-                  "right": {
-                      "location": "RIGHT",
-                      "id": 6
-                  }
-              },
-              inputConnectors: [
-                  {
-                      name: ""
-                  }
-              ],
-              outputConnectors: [
-                  {
-                      name: ""
-                  }
-              ],
-              width: 250
-          };
-      }
+        /**
+         * Called after a user Adds a table to fetch the Columns and datatypes.
+         * @param {string} schema the schema name
+         * @param {string} table the table name
+         * @param callback the callback function
+         * @returns {HttpPromise}
+         */
+        function getTableSchema(schema, table, callback) {
+            var promise;
+            if (self.model.selectedDatasourceId === VisualQueryService.HIVE_DATASOURCE) {
+                promise = $http.get(RestUrlService.HIVE_SERVICE_URL + "/schemas/" + schema + "/tables/" + table)
+                    .then(function (response) {
+                        return response.data;
+                    });
+            } else {
+                promise = DatasourcesService.getTableSchema(self.model.selectedDatasourceId, table, schema);
+            }
 
-      function newNodeAttr(name,dataType,nativeDataType,dataTypeWithPrecisionAndScale){
-          if(angular.isUndefined(dataTypeWithPrecisionAndScale)) {
-              dataTypeWithPrecisionAndScale = dataType;
-          }
-         return {
-              "sampleValues": [],
-              "name": name,
-              "description": null,
-              "nativeDataType": nativeDataType,
-              "derivedDataType": dataType,
-              "primaryKey": false,
-              "nullable": true,
-              "modifiable": true,
-              "dataTypeDescriptor": null,
-              "updatedTracker": false,
-              "precisionScale": null,
-              "createdTracker": false,
-              "dataTypeWithPrecisionAndScale": dataTypeWithPrecisionAndScale,
-              "descriptionWithoutNewLines": "",
-              "selected": true
-          };
-      }
+            return promise.then(callback, function () {
+                self.loading = false;
+            });
+        }
 
-      function newSqlColumn(schema,table,tableAlias,column) {
-            return  {
-              "column": column,
-              "alias": tableAlias,
-              "tableName": schema+"."+table,
-              "tableColumn": column
-          };
-      }
+        function newTableNodeDataModel(datasourceId, schema, table, nodeId, coord, attrs) {
+            var nodeName = schema + "." + table;
+            return {
+                name: nodeName,
+                id: nodeId,
+                datasourceId: datasourceId,
+                x: coord.x,
+                y: coord.y,
+                nodeAttributes: {
+                    attributes: attrs,
+                    reference: [schema, table],
+                    selected: []
+                },
+                connectors: {
+                    "top": {
+                        "location": "TOP",
+                        "id": 7
+                    },
+                    "bottom": {
+                        "location": "BOTTOM",
+                        "id": 8
+                    },
+                    "left": {
+                        "location": "LEFT",
+                        "id": 5
+                    },
+                    "right": {
+                        "location": "RIGHT",
+                        "id": 6
+                    }
+                },
+                inputConnectors: [
+                    {
+                        name: ""
+                    }
+                ],
+                outputConnectors: [
+                    {
+                        name: ""
+                    }
+                ],
+                width: 250
+            };
+        }
+
+        function getNewXYCoord() {
+            var coord = {x: 20, y: 20};
+            return coord;
+        }
+
+        /**
+         * Adds utility functions to a node data model.
+         *
+         * @param {Object} node the node data model
+         */
+        this.prepareNode = function (node) {
+            /**
+             * Indicates if all of the attributes are selected.
+             *
+             * @returns {boolean} {@code true} if all attributes are selected, or {@code false} otherwise
+             */
+            node.nodeAttributes.hasAllSelected = function () {
+                return _.every(this.attributes, function (attr) {
+                    return attr.selected
+                });
+            };
+
+            /**
+             * Selects the specified attribute.
+             *
+             * @param {Object} attr the attribute to be selected
+             */
+            node.nodeAttributes.select = function (attr) {
+                attr.selected = true;
+                this.selected.push(attr);
+                validate();
+            };
+
+            /**
+             * Selects all attributes.
+             */
+            node.nodeAttributes.selectAll = function () {
+                var selected = [];
+                angular.forEach(this.attributes, function (attr) {
+                    attr.selected = true;
+                    selected.push(attr);
+                });
+                this.selected = selected;
+                validate();
+            };
+
+            /**
+             * Deselects the specified attribute.
+             *
+             * @param {Object} attr the attribute to be deselected
+             */
+            node.nodeAttributes.deselect = function (attr) {
+                attr.selected = false;
+                var idx = this.selected.indexOf(attr);
+                if (idx > -1) {
+                    this.selected.splice(idx, 1);
+                }
+                validate();
+            };
+
+            /**
+             * Deselects all attributes.
+             */
+            node.nodeAttributes.deselectAll = function () {
+                angular.forEach(this.attributes, function (attr) {
+                    attr.selected = false;
+                });
+                this.selected = [];
+                validate();
+            };
+        };
+
+    };
 
 
-      function populateVisualQueryModelWithExample(){
-          var chartDataModel = {connections:[],nodes:[]};
+    var moduleName = "kylo.plugin.processor-template.dt.run-feed";
+    angular.module(moduleName, [])
+    angular.module(moduleName).controller('DataTransformationRunFeedController', ["$scope", "$q", "$http", "$mdToast", "$mdDialog", "$interval", "FeedService", "VisualQueryService", "DatasourcesService", controller]);
 
-          var datasource ='HIVE';
-          var schema = 'test'
-          var table = 'example';
-          //unique node id
-          var nodeId = 10;
-          //used for sql syntax
-          var tableAlias = 'tbl10'
-
-          //arr of attrs for the table view
-          var nodeAttrs = [];
-
-          var columnsAndTables = [];
-
-          var columnData = [{name:"col1",dataType:'string',nativeType:'VARCHAR'},
-              {name:"col2",dataType:'string',nativeType:'VARCHAR'},
-              {name:"col3",dataType:'int',nativeType:'INTEGER'}];
-
-          var sql = "";
-
-           //build up the attrs, sql, and columns,tables
-              _.each(columnData, function (col) {
-                  nodeAttrs.push(newNodeAttr(col.name, col.dataType, col.nativeType));
-                  columnsAndTables.push(newSqlColumn(schema,table,tableAlias,col.name));
-                  //todo populate the vqServiceModel
-                  //vqServiceModel.visualQuerySql = "SELECT...
-              });
-
-              var nodeTableModel = newTableNodeDataModel(datasource,schema,table,nodeId,{x:20,y:20},nodeAttrs);
-            chartDataModel.nodes.push(nodeTableModel);
-            vqServiceModel.visualQueryModel = chartDataModel;
-            vqServiceModel.selectedColumnsAndTables = columnsAndTables;
-          }
-
-      };
-
-
-
-var moduleName = "kylo.plugin.processor-template.dt.run-feed";
-angular.module(moduleName, [])
-angular.module(moduleName).controller('DataTransformationRunFeedController',["$scope","$q","$http","$mdToast","$interval","FeedService","VisualQueryService", "DatasourcesService",controller]);
-
-angular.module(moduleName)
-    .directive('kyloDataTransformRunFeedProcessor', directive);
+    angular.module(moduleName)
+        .directive('kyloDataTransformRunFeedProcessor', directive);
 
 });
 
